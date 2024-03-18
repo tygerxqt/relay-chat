@@ -1,9 +1,14 @@
+import { ThemeSwitch } from "./components/theme-switch";
+import { ThemeProvider } from "./providers/theme";
+
 export default function App() {
 	return (
 		<>
-			<main className="w-full min-h-full text-center items-center justify-center">
-				<h1>Hello World!</h1>
-			</main>
+			<ThemeProvider>
+				<main className="w-full min-h-screen text-center items-center justify-center">
+					<ThemeSwitch />
+				</main>
+			</ThemeProvider>
 		</>
 	);
 }
