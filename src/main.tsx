@@ -4,11 +4,14 @@ import App from "./app";
 import { ThemeProvider } from "./providers/theme";
 import { AuthProvider } from "./providers/auth";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import NotFound from "./pages/not-found";
+import Error from "./pages/error";
 
 const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <App />,
+		errorElement: <Error />,
 		children: [
 			{
 				// An empty path will match the parent route
@@ -17,6 +20,7 @@ const router = createBrowserRouter([
 			},
 		],
 	},
+	{ path: "*", element: <NotFound /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
