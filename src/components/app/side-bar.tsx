@@ -52,7 +52,7 @@ export default function Sidebar() {
 															alt={friend.username}
 															className="w-8 h-8 rounded-full"
 														/>
-														<span className="font-medium">
+														<span className="font-medium overflow-hidden text-ellipsis">
 															{friend.username}
 														</span>
 													</Button>

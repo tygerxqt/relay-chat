@@ -20,8 +20,10 @@
 		"windows": [
 			{
 				"title": "Relay",
-				"width": 1200,
-				"height": 600
+				"width": 1280,
+				"height": 720,
+				"minWidth": 950,
+				"minHeight": 500
 			}
 		],
 		"security": {
