@@ -14,7 +14,7 @@ export default function Authentication() {
 
 	const [loading, setLoading] = useState(false);
 
-	const { logIn } = useAuth();
+	const { logIn, register, resetPassword } = useAuth();
 
 	const switchMode = (mode: "login" | "register" | "reset") => {
 		if (!loading) {
@@ -31,9 +31,13 @@ export default function Authentication() {
 	const onSignIn = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		setLoading(true);
-		await logIn(email, password).catch((error) => console.error(error));
-		setLoading(false);
+		try {
+			await logIn(email, password);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const onRegister = async (e: FormEvent<HTMLFormElement>) => {
@@ -42,10 +46,7 @@ export default function Authentication() {
 		setLoading(true);
 
 		try {
-			console.log(
-				`Submitting register with data: ${name}, ${username}, ${email}, ${password}`
-			);
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			await register(fullName, username, email, password, password);
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -59,8 +60,7 @@ export default function Authentication() {
 		setLoading(true);
 
 		try {
-			console.log(`Submitting password reset with email: ${email}`);
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			await resetPassword(email);
 		} catch (error) {
 			console.error(error);
 		} finally {
