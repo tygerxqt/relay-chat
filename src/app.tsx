@@ -1,14 +1,18 @@
+import Authentication from "./components/auth";
 import { ThemeSwitch } from "./components/theme-switch";
-import { ThemeProvider } from "./providers/theme";
+import { useAuth } from "./providers/auth";
 
 export default function App() {
+	const { loggedIn } = useAuth();
 	return (
 		<>
-			<ThemeProvider>
+			{loggedIn ? (
 				<main className="w-full min-h-screen text-center items-center justify-center">
 					<ThemeSwitch />
 				</main>
-			</ThemeProvider>
+			) : (
+				<Authentication />
+			)}
 		</>
 	);
 }
