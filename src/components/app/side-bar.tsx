@@ -52,7 +52,9 @@ export default function Sidebar() {
 															alt={friend.username}
 															className="w-8 h-8 rounded-full"
 														/>
-														<span className="font-medium">{user.username}</span>
+														<span className="font-medium">
+															{friend.username}
+														</span>
 													</Button>
 												);
 											})}
