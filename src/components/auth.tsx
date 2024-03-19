@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/providers/auth";
+import Spinner from "./spinner";
 
 export default function Authentication() {
 	const [mode, setMode] = useState<"login" | "register" | "reset">("login");
@@ -111,11 +112,11 @@ export default function Authentication() {
 										/>
 										<Button
 											size="sm"
-											className={`text-white bg-blue-500 hover:bg-blue-500/80`}
+											variant="primary"
 											disabled={loading}
 											type="submit"
 										>
-											{loading ? "Loading..." : "Submit"}
+											{loading ? <Spinner size={22} /> : "Submit"}
 										</Button>
 									</form>
 								</>
@@ -157,11 +158,11 @@ export default function Authentication() {
 										/>
 										<Button
 											size="sm"
-											className={`text-white bg-blue-500 hover:bg-blue-500/80`}
+											variant="primary"
 											disabled={loading}
 											type="submit"
 										>
-											{loading ? "Loading..." : "Submit"}
+											{loading ? <Spinner size={22} /> : "Submit"}
 										</Button>
 									</form>
 								</>
@@ -181,11 +182,11 @@ export default function Authentication() {
 										/>
 										<Button
 											size="sm"
-											className={`text-white bg-blue-500 hover:bg-blue-500/80`}
+											variant="primary"
 											disabled={loading}
 											type="submit"
 										>
-											{loading ? "Loading..." : "Send"}
+											{loading ? <Spinner size={22} /> : "Send"}
 										</Button>
 									</form>
 								</>
