@@ -18,6 +18,10 @@ jobs:
         with:
           node-version: 20
 
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
       - name: get version
         run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
