@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/providers/auth";
-import Spinner from "./spinner";
+import Spinner from "../spinner";
 
 export default function Authentication() {
 	const [mode, setMode] = useState<"login" | "register" | "reset">("login");
