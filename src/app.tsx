@@ -15,11 +15,11 @@ export default function App() {
 		<main className="flex flex-row w-full min-h-screen">
 			{loggedIn ? (
 				<ResizablePanelGroup direction="horizontal">
-					<ResizablePanel minSize={25} maxSize={35}>
+					<ResizablePanel minSize={25} maxSize={35} className="min-h-screen max-h-screen">
 						<Sidebar />
 					</ResizablePanel>
 					<ResizableHandle withHandle />
-					<ResizablePanel>
+					<ResizablePanel className="min-h-screen max-h-screen">
 						<Outlet />
 					</ResizablePanel>
 				</ResizablePanelGroup>
