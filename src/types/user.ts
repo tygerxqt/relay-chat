@@ -11,6 +11,10 @@ type User = {
 	updated: string;
 	username: string;
 	verified: boolean;
+	expand: {
+		friends?: Array<User>;
+		[key: string]: any;
+	}
 };
 
 export default User;
