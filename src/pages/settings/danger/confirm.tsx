@@ -71,8 +71,8 @@ export function DeleteAccountConfirm({
 							<DialogHeader className="px-6 pt-6">
 								<DialogTitle>Delete Account</DialogTitle>
 								<DialogDescription>
-									Katarogu will <b>permanently</b> delete all data associated
-									with your account.
+									Relay will <b>permanently</b> delete all data associated with
+									your account.
 									<br /> <br />
 									We recommend you export your data before deleting your
 									account.
@@ -132,7 +132,7 @@ export function DeleteAccountConfirm({
 						<DrawerHeader className="p-6 text-left">
 							<DrawerTitle>Delete Account</DrawerTitle>
 							<DrawerDescription>
-								Katarogu will <b>permanently</b> delete all data associated with
+								Relay will <b>permanently</b> delete all data associated with
 								your account.
 								<br /> <br />
 								We reccomend you export your data before deleting your account.

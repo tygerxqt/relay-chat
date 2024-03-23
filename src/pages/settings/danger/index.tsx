@@ -18,8 +18,8 @@ export default function DangerSettingsPage() {
 									<h1 className="text-xl font-bold">Delete Account</h1>
 									<p className="text-sm">
 										Permanently delete your account and all of its contents from
-										the Katarogu platform. This action is not reversible, so
-										please continue with caution.
+										the Relay platform. This action is not reversible, so please
+										continue with caution.
 									</p>
 								</div>
 							</div>
