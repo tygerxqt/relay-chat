@@ -36,14 +36,12 @@ export function DeleteAccountConfirm({
 	const [open, setOpen] = React.useState(false);
 	const [username, setUsername] = React.useState("");
 	const [phrase, setPhrase] = React.useState("");
-	const [loading, setLoading] = React.useState(false);
 	const [enabled, setEnabled] = React.useState(false);
 
 	const toggleOpen = React.useCallback(() => {
 		setOpen(!open);
 		setUsername("");
 		setPhrase("");
-		setLoading(false);
 		setEnabled(false);
 	}, [open]);
 
