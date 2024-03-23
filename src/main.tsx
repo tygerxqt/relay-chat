@@ -9,6 +9,7 @@ import NotFound from "./pages/not-found";
 import Error from "./pages/error";
 import DirectMessagePage, { loader as DirectMessageLoader } from "./pages/direct-message";
 import { TooltipProvider } from "./components/ui/tooltip";
+import { Toaster } from "sonner";
 
 const router = typesafeBrowserRouter([
 	{
@@ -25,8 +26,8 @@ const router = typesafeBrowserRouter([
 				path: "friends/:id",
 				element: <DirectMessagePage />,
 				errorElement: <Error />,
-				loader: DirectMessageLoader
-			}
+				loader: DirectMessageLoader,
+			},
 		],
 	},
 	{ path: "*", element: <NotFound /> },
@@ -36,6 +37,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	<ThemeProvider defaultTheme="dark" storageKey="relay-theme">
 		<AuthProvider>
 			<TooltipProvider>
+				<Toaster />
 				<RouterProvider router={router.router} />
 			</TooltipProvider>
 		</AuthProvider>
