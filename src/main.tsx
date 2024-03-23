@@ -1,16 +1,32 @@
 import ReactDOM from "react-dom/client";
 
+import { typesafeBrowserRouter } from "react-router-typesafe";
+import { RouterProvider } from "react-router-dom";
+
 import App from "./app";
+
 import { ThemeProvider } from "./providers/theme";
 import { AuthProvider } from "./providers/auth";
-import { RouterProvider } from "react-router-dom";
-import { typesafeBrowserRouter } from "react-router-typesafe";
-import NotFound from "./pages/not-found";
-import Error from "./pages/error";
-import DirectMessagePage, { loader as DirectMessageLoader } from "./pages/direct-message";
+import { HealthProvider } from "./providers/health";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "sonner";
-import { HealthProvider } from "./providers/health";
+
+import NotFound from "./pages/not-found";
+import Error from "./pages/error";
+
+import DirectMessagePage, {
+	loader as DirectMessageLoader,
+} from "./pages/friends/direct-message";
+import AccountSettingsPage from "./pages/settings/account";
+import SettingsLayout from "./pages/settings";
+
+// Styles for image cropper
+import "react-image-crop/dist/ReactCrop.css";
+
+// Add buffer polyfills
+import { Buffer as BufferPolyfill } from "buffer";
+declare var Buffer: typeof BufferPolyfill;
+globalThis.Buffer = BufferPolyfill;
 
 const router = typesafeBrowserRouter([
 	{
@@ -28,6 +44,17 @@ const router = typesafeBrowserRouter([
 				element: <DirectMessagePage />,
 				errorElement: <Error />,
 				loader: DirectMessageLoader,
+			},
+		],
+	},
+	{
+		path: "/settings",
+		element: <SettingsLayout />,
+		children: [
+			{
+				path: "account",
+				element: <AccountSettingsPage />,
+				errorElement: <Error />,
 			},
 		],
 	},
