@@ -1,11 +1,11 @@
-import { defineConfig } from "vite";
+import { defineConfig, splitVendorChunkPlugin } from "vite";
 import react from "@vitejs/plugin-react";
 import million from "million/compiler";
 import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-	plugins: [million.vite({ auto: true }), react()],
+	plugins: [million.vite({ auto: true }), react(), splitVendorChunkPlugin()],
 	clearScreen: false,
 	server: {
 		port: 1420,
