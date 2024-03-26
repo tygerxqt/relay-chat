@@ -9,6 +9,7 @@ import pb from "@/lib/pocketbase"
 import { toast } from "sonner";
 import Message from "@/components/chat/message";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { RecordSubscription } from "pocketbase";
 
 export default function DirectMessagePage() {
     const { recipient, messages } = useLoaderData<typeof loader>();
@@ -25,14 +26,48 @@ export default function DirectMessagePage() {
             recipient: recipient.id,
             author: pb.authStore.model?.id,
             content: msg
-        }, { expand: "author" }).then((res) => {
-            console.log(res);
-            setMsgs([...msgs, res]);
+        }, { expand: "author, recipient" }).then((res) => {
+            // setMsgs([...msgs, res]);
             setMsg("");
         }).catch((err) => {
             toast.error(err.message);
         })
     }
+
+    useEffect(() => {
+        pb.collection<DirectMessage>("direct_messages").subscribe("*", (e: RecordSubscription<DirectMessage>) => {
+            console.log(e.action, e.record)
+            switch (e.action) {
+                case "create": {
+                    if ([e.record.expand.author.id, e.record.expand.recipient.id].includes(recipient.id || pb.authStore.model?.id)) {
+                        console.log("RECORD: ", e.record)
+                        setMsgs((prev) => [...prev, e.record]);
+                    }
+                    break;
+                }
+
+                case "update": {
+                    const index = msgs.findIndex((msg) => msg.id === e.record.id);
+                    msgs[index] = e.record;
+                    setMsgs([...msgs]);
+                    break;
+                }
+
+                case "delete": {
+                    const index = msgs.findIndex((msg) => msg.id === e.record.id);
+                    msgs.splice(index, 1);
+                    setMsgs([...msgs]);
+                    break;
+                }
+            }
+        }, {
+            expand: "author, recipient"
+        })
+
+        return () => {
+            pb.collection("direct_messages").unsubscribe("*");
+        }
+    }, []);
 
     useEffect(() => {
         const handleKeyDown = async (e: KeyboardEvent) => {
@@ -136,17 +171,25 @@ export const loader = makeLoader(async ({ params }) => {
         expand: "friends"
     });
 
-    if (user.friends.length <= 0) {
+    if (!user || !recipient) {
+        throw new Error("Failed to fetch either the user or the recipient. Make sure you are friends with the recipient to send direct messages.");
+    }
+
+    if (!user.expand.friends || user.expand.friends.length <= 0) {
         throw new Error("You have no friends. Make sure you add friends to send direct messages.")
     }
 
-    if (user.friends.length = 0 && !user.expand.friends?.map(f => f.id).includes(params.id)) {
+    if (!recipient.expand.friends || recipient.expand.friends.length <= 0) {
+        throw new Error("The recipient has not added you as a friend. Make sure they add you to send direct messages.")
+    }
+
+    if (!user.expand.friends?.map(f => f.id).includes(params.id) || !recipient.expand.friends?.map(f => f.id).includes(pb.authStore.model?.id)) {
         throw new Error("You and the recipient are not friends. Make sure you both add each other as friends to send direct messages.");
     }
 
     const messages = await pb.collection<DirectMessage>("direct_messages").getList(1, 50, {
-        filter: `recipient.id = "${params.id}"`,
-        expand: "author"
+        filter: `(recipient.id = "${recipient.id}" || recipient.id = "${pb.authStore.model?.id}")`,
+        expand: "author, recipient"
     });
 
     console.log(messages)

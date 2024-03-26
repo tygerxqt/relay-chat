@@ -11,6 +11,7 @@ export interface DirectMessage {
     updated: string
     expand: {
         author: User
+        recipient: User
         [key: string]: any
     }
 }

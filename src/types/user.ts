@@ -12,7 +12,7 @@ type User = {
 	username: string;
 	verified: boolean;
 	expand: {
-		friends?: Array<User>;
+		friends: Array<User>;
 		[key: string]: any;
 	}
 };
