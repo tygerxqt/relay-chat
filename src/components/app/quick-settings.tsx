@@ -19,7 +19,7 @@ export default function QuickSettings() {
 							<span className="absolute bottom-0 right-0 border-2 border-transparent w-[10px] h-[10px] bg-green-600 rounded-full"></span>
 						</div>
 						<div className="flex flex-col">
-							<span className="text-sm font-semibold">{"Ty Mason"}</span>
+							<span className="text-sm font-semibold">{user.name}</span>
 							<span className="text-xs text-neutral-500 dark:text-neutral-400">
 								@{user.username}
 							</span>

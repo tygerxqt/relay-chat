@@ -70,7 +70,7 @@ export default function BannerRemove(props: ButtonProps) {
 							/>
 						</AspectRatio>
 					</div>
-					<div className="flex flex-row items-center justify-between gap-4 border-t bg-neutral-900/50 p-4">
+					<div className="flex flex-row items-center justify-between gap-4 border-t dark:bg-neutral-900/50 bg-neutral-200/50 p-4">
 						<span className="text-sm text-neutral-600 dark:text-neutral-400">
 							This action is not reversible.
 						</span>

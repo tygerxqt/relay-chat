@@ -112,7 +112,7 @@ export default function DirectMessagePage() {
                         <ScrollArea className="h-full flex flex-col w-full grow">
                             {msgs.length <= 0 ? (
                                 <>
-                                    <div className="flex flex-col justify-center items-center w-full h-full">
+                                    <div className="flex flex-col justify-center items-center w-full min-h-full grow">
                                         <span className="text-medium">No messages yet</span>
                                     </div>
                                 </>
@@ -189,7 +189,8 @@ export const loader = makeLoader(async ({ params }) => {
 
     const messages = await pb.collection<DirectMessage>("direct_messages").getList(1, 50, {
         filter: `(recipient.id = "${recipient.id}" || recipient.id = "${pb.authStore.model?.id}")`,
-        expand: "author, recipient"
+        expand: "author, recipient",
+        sort: "+created"
     });
 
     console.log(messages)
