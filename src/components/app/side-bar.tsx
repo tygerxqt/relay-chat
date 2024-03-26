@@ -1,7 +1,7 @@
 import QuickSettings from "@/components/app/quick-settings";
 import { useAuth } from "@/providers/auth";
 import { Button } from "../ui/button";
-import { HomeIcon, UserSearchIcon } from "lucide-react";
+import { HomeIcon, PlusIcon, UserSearchIcon } from "lucide-react";
 import { Suspense } from "react";
 import { Link } from "react-router-dom";
 import { ScrollArea } from "../ui/scroll-area";
@@ -15,7 +15,7 @@ export default function Sidebar() {
 				<>
 					<div className="z-10 flex-1 flex flex-col gap-2 min-h-screen h-screen w-full grow bg-neutral-100/50 dark:bg-neutral-900/50">
 						<div className="flex flex-col h-full">
-							<div className="flex flex-col justify-between gap-3 p-3 flex-cols rounded-tl-3xl">
+							<div className="flex flex-col justify-between gap-2 p-3 flex-cols rounded-tl-3xl">
 								<Link to="/" className="w-full">
 									<Button
 										variant={"ghost"}
@@ -41,6 +41,15 @@ export default function Sidebar() {
 									{friends.length >= 1 ? (
 										<div className="flex flex-col items-center justify-start min-h-full gap-2 px-2 text-center">
 											<ScrollArea className="h-full flex flex-col w-full grow">
+												<div className="flex flex-row gap-2 items-center justify-between px-3 py-2  text-neutral-500 dark:text-neutral-400">
+													<span className="text-start text-xs font-semibold">
+														Your Friends
+													</span>
+													{/* TODO: Add friend trigger here */}
+													<button>
+														<PlusIcon size={18} />
+													</button>
+												</div>
 												{friends.map((friend) => {
 													return (
 														<>
