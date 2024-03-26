@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DirectMessage } from "@/types/message";
-import { FilePlusIcon, Pin, SendHorizontalIcon } from "lucide-react";
+import { FilePlusIcon, Pin, SendHorizontalIcon, UserIcon } from "lucide-react";
 import { makeLoader, useLoaderData } from "react-router-typesafe";
 import { useEffect, useState } from "react";
 import User from "@/types/user";
@@ -97,16 +97,28 @@ export default function DirectMessagePage() {
                                         {recipient.username}
                                     </span>
                                 </div>
-                                <Tooltip delayDuration={150}>
-                                    <TooltipTrigger>
-                                        <Button size="icon" variant="ghost">
-                                            <Pin fill="currentColor" size={24} />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        Pinned Messages
-                                    </TooltipContent>
-                                </Tooltip>
+                                <div className="flex flex-row items-center">
+                                    <Tooltip delayDuration={150}>
+                                        <TooltipTrigger>
+                                            <Button size="icon" variant="ghost">
+                                                <Pin size={24} />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            Pinned Messages
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    <Tooltip delayDuration={150}>
+                                        <TooltipTrigger>
+                                            <Button size="icon" variant="ghost">
+                                                <UserIcon size={24} />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            View @{recipient.username}'s profile
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
                             </div>
                         </div>
                         <ScrollArea className="h-full flex flex-col w-full grow">
