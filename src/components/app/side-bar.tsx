@@ -2,12 +2,14 @@ import QuickSettings from "@/components/app/quick-settings";
 import { useAuth } from "@/providers/auth";
 import { Button } from "../ui/button";
 import { HomeIcon, PlusIcon, UserSearchIcon } from "lucide-react";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Link } from "react-router-dom";
 import { ScrollArea } from "../ui/scroll-area";
+import { AddFriends } from "../chat/add-friends";
 
 export default function Sidebar() {
 	const { user, friends } = useAuth();
+	const [friendsOpen, setFriensOpen] = useState(false);
 
 	return (
 		<>
@@ -25,9 +27,11 @@ export default function Sidebar() {
 										Home
 									</Button>
 								</Link>
+								<AddFriends open={friendsOpen} setOpen={setFriensOpen} />
 								<Button
 									variant={"ghost"}
 									className="flex flex-row items-center justify-start w-full gap-3 text-medium"
+									onClick={() => setFriensOpen(true)}
 								>
 									<UserSearchIcon size={24} />
 									Add Friend
@@ -45,24 +49,28 @@ export default function Sidebar() {
 													<span className="text-start text-xs font-semibold">
 														Your Friends
 													</span>
-													{/* TODO: Add friend trigger here */}
-													<button>
+													<button onClick={() => setFriensOpen(true)}>
 														<PlusIcon size={18} />
 													</button>
 												</div>
 												{friends.map((friend) => {
 													return (
 														<>
-															<Link to={`/friends/${friend.id}`} className="w-full">
+															<Link
+																to={`/friends/${friend.id}`}
+																className="w-full"
+															>
 																<Button
 																	id={friend.id}
 																	variant={"ghost"}
 																	className="flex flex-row items-center justify-start w-full gap-3 text-medium"
 																>
 																	<img
-																		src={`${import.meta.env.VITE_AUTH_URL
-																			}/api/files/_pb_users_auth_/${friend.id}/${friend.avatar
-																			}`}
+																		src={`${
+																			import.meta.env.VITE_AUTH_URL
+																		}/api/files/_pb_users_auth_/${friend.id}/${
+																			friend.avatar
+																		}`}
 																		alt={friend.username}
 																		className="w-8 h-8 rounded-full"
 																	/>
@@ -82,7 +90,11 @@ export default function Sidebar() {
 											<p className="text-neutral-500 dark:text-neutral-400">
 												Add some friends to start chatting with them!
 											</p>
-											<Button size="sm" className="mt-3">
+											<Button
+												size="sm"
+												className="mt-3"
+												onClick={() => setFriensOpen(true)}
+											>
 												Add Friend
 											</Button>
 										</div>
