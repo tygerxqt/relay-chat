@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/providers/auth";
 import { LogOut, X } from "lucide-react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, redirect, useNavigate } from "react-router-dom";
 
 export default function SettingsLayout() {
 	const { logOut } = useAuth();
+	const navigate = useNavigate();
+
 	return (
 		<>
 			<main className="w-full min-h-screen">
@@ -45,7 +47,10 @@ export default function SettingsLayout() {
 							<Button
 								className="hover:bg-red-100 flex flex-row gap-2 items-center hover:dark:bg-red-800 w-full"
 								variant="ghost"
-								onClick={async () => await logOut()}
+								onClick={() => {
+									logOut();
+									return navigate("/");
+								}}
 							>
 								<LogOut size={16} /> Log out
 							</Button>

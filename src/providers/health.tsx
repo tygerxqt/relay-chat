@@ -1,5 +1,4 @@
 import pb from "@/lib/pocketbase";
-import Offline from "@/components/app/offline";
 import { createContext, useContext, useEffect, useState } from "react";
 
 export interface Health {
@@ -48,7 +47,7 @@ export const HealthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<HealthContext.Provider value={{ online, checkHealth }}>
-			{mounted && <>{online ? <>{children}</> : <Offline />}</>}
+			{mounted && children}
 		</HealthContext.Provider>
 	);
 };

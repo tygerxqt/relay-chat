@@ -26,6 +26,7 @@ import "react-image-crop/dist/ReactCrop.css";
 // Add buffer polyfills
 import { Buffer as BufferPolyfill } from "buffer";
 import DangerSettingsPage from "./pages/settings/danger";
+import Home from "./pages";
 declare var Buffer: typeof BufferPolyfill;
 globalThis.Buffer = BufferPolyfill;
 
@@ -37,7 +38,7 @@ const router = typesafeBrowserRouter([
 			{
 				// An empty path will match the parent route
 				path: "",
-				element: <div>Home</div>,
+				element: <Home />,
 				errorElement: <Error />,
 			},
 			{
