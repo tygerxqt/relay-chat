@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/providers/auth";
 import { MessageCircleWarning, TriangleAlert } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function DeleteAccountConfirm({
 	children,
@@ -58,6 +59,7 @@ export function DeleteAccountConfirm({
 	}, [username, phrase, user, toggleOpen]);
 
 	const isDesktop = useMediaQuery("(min-width: 768px)");
+	const navigate = useNavigate();
 
 	if (isDesktop) {
 		return (
@@ -109,7 +111,10 @@ export function DeleteAccountConfirm({
 								<Button
 									variant="destructive"
 									disabled={!enabled}
-									onClick={() => deleteAccount()}
+									onClick={async () => {
+										await deleteAccount();
+										navigate("/");
+									}}
 								>
 									Confirm Deletion
 								</Button>
@@ -168,7 +173,10 @@ export function DeleteAccountConfirm({
 							</Button>
 							<Button
 								variant="destructive"
-								onClick={() => deleteAccount()}
+								onClick={async () => {
+									await deleteAccount();
+									navigate("/");
+								}}
 								disabled={!enabled}
 							>
 								Delete Account

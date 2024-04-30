@@ -29,25 +29,48 @@ export function AddFriends({
 	const [query, setQuery] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [results, setResults] = useState<RecordModel[]>([]);
+
+	const [incomingRequests, setIncomingRequests] = useState<string[]>([]);
+	const [outgoingRequests, setOutgoingRequests] = useState<string[]>([]);
 	const { friends } = useAuth();
 
-	useEffect(() => {
-		async function fetchFriends() {
-			setLoading(true);
-			const res = await pb.collection("users").getFullList({
-				filter: `username ~ "${query}"`,
+	async function fetchRequests() {
+		await pb
+			.collection("friend_requests")
+			.getFullList({ expand: "to,from" })
+			.then((res) => {
+				console.log(res);
+				const incoming = res
+					.filter((record) => record.expand?.to.id === pb.authStore.model?.id)
+					.map((record) => record.expand?.to.id);
+				const outgoing = res
+					.filter((record) => record.expand?.from.id === pb.authStore.model?.id)
+					.map((record) => record.expand?.from.id);
+				console.log("Incoming friend requests: ", incoming);
+				console.log("Outgoing friend requests: ", outgoing);
+				setIncomingRequests(incoming);
+				setOutgoingRequests(outgoing);
 			});
+	}
 
-			const nextUsers = res
-				.filter((user) => user.id !== pb.authStore.model?.id)
-				.filter((user) => !results.find((result) => result.id === user.id));
+	async function fetchFriends() {
+		setLoading(true);
+		const res = await pb.collection("users").getFullList({
+			filter: `username ~ "${query}"`,
+		});
 
-			setResults([...results, ...nextUsers]);
-			setLoading(false);
-		}
+		const nextUsers = res
+			.filter((user) => user.id !== pb.authStore.model?.id)
+			.filter((user) => !results.find((result) => result.id === user.id));
 
+		setResults([...results, ...nextUsers]);
+		setLoading(false);
+	}
+
+	useEffect(() => {
 		const timer = setTimeout(() => {
 			fetchFriends();
+			fetchRequests();
 		}, 300);
 
 		return () => clearTimeout(timer);
@@ -57,8 +80,13 @@ export function AddFriends({
 		async function sendRequest() {
 			let currentFriends = pb.authStore.model?.friends;
 
-			await pb.collection("users").update(pb.authStore.model?.id, {
-				friends: [...currentFriends, id],
+			if (currentFriends && currentFriends.includes(id)) {
+				throw new Error("You are already friends with this user.");
+			}
+
+			await pb.collection("friend_requests").create({
+				from: pb.authStore.model?.id,
+				to: id,
 			});
 		}
 
@@ -93,6 +121,7 @@ export function AddFriends({
 								className="flex flex-row items-center justify-between w-full gap-2 bg-transparent dark:bg-transparent"
 								disabled={false}
 							>
+								{" "}
 								<div className="flex flex-row items-center gap-2">
 									<Avatar>
 										<AvatarImage
@@ -121,14 +150,32 @@ export function AddFriends({
 											Already Friends
 										</Button>
 									) : (
-										<Button
-											size="sm"
-											className="flex flex-row gap-2"
-											onClick={() => sendFriendRequest(result.id)}
-										>
-											<Plus size={16} />
-											Add
-										</Button>
+										<>
+											{outgoingRequests.includes(result.id) ? (
+												<>
+													<Button
+														size="sm"
+														variant="outline"
+														className="flex flex-row gap-2"
+														disabled
+													>
+														<Plus size={16} />
+														Request Sent
+													</Button>
+												</>
+											) : (
+												<>
+													<Button
+														size="sm"
+														className="flex flex-row gap-2"
+														onClick={() => sendFriendRequest(result.id)}
+													>
+														<Plus size={16} />
+														Add
+													</Button>
+												</>
+											)}
+										</>
 									)}
 								</div>
 							</CommandItem>

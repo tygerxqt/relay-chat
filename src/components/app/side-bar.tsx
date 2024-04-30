@@ -9,7 +9,7 @@ import { AddFriends } from "../chat/add-friends";
 
 export default function Sidebar() {
 	const { user, friends } = useAuth();
-	const [friendsOpen, setFriensOpen] = useState(false);
+	const [friendsOpen, setFriendsOpen] = useState(false);
 
 	return (
 		<>
@@ -27,11 +27,11 @@ export default function Sidebar() {
 										Home
 									</Button>
 								</Link>
-								<AddFriends open={friendsOpen} setOpen={setFriensOpen} />
+								<AddFriends open={friendsOpen} setOpen={setFriendsOpen} />
 								<Button
 									variant={"ghost"}
 									className="flex flex-row items-center justify-start w-full gap-3 text-medium"
-									onClick={() => setFriensOpen(true)}
+									onClick={() => setFriendsOpen(true)}
 								>
 									<UserSearchIcon size={24} />
 									Add Friend
@@ -49,10 +49,11 @@ export default function Sidebar() {
 													<span className="text-start text-xs font-semibold">
 														Your Friends
 													</span>
-													<button onClick={() => setFriensOpen(true)}>
+													<button onClick={() => setFriendsOpen(true)}>
 														<PlusIcon size={18} />
 													</button>
 												</div>
+
 												{friends.map((friend) => {
 													return (
 														<>
@@ -93,7 +94,7 @@ export default function Sidebar() {
 											<Button
 												size="sm"
 												className="mt-3"
-												onClick={() => setFriensOpen(true)}
+												onClick={() => setFriendsOpen(true)}
 											>
 												Add Friend
 											</Button>

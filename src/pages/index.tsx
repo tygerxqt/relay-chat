@@ -12,7 +12,6 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
 	const { user, avatar, logOut } = useAuth();
-	const [friends, setFriends] = useState(false);
 	return (
 		<>
 			<main className="flex flex-col w-full min-h-screen items-center justify-center gap-4 p-16">
@@ -20,7 +19,6 @@ export default function Home() {
 					<h1 className="font-bold text-4xl">Relay</h1>
 					<p className="font-medium">Effortless. Digital. Communication.</p>
 				</div>
-				<AddFriends open={friends} setOpen={setFriends} />
 				<div className="flex flex-col gap-2 items-center justify-center">
 					{user && (
 						<div className="flex flex-row gap-2 items-center justify-center w-full">
@@ -40,22 +38,6 @@ export default function Home() {
 									</span>
 								</div>
 							</div>
-							<Tooltip delayDuration={0}>
-								<TooltipContent>
-									<span>Add Friends</span>
-								</TooltipContent>
-								<TooltipTrigger>
-									<Button
-										variant="secondary"
-										size="icon"
-										className="w-16 h-16"
-										onClick={() => setFriends(true)}
-									>
-										<UserSearchIcon size={24} />
-									</Button>
-								</TooltipTrigger>
-							</Tooltip>
-
 							<Tooltip delayDuration={0}>
 								<TooltipContent>
 									<span>Settings</span>
