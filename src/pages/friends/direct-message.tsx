@@ -32,7 +32,7 @@ export default function DirectMessagePage() {
 				},
 				{ expand: "author, recipient" }
 			)
-			.then((res) => {
+			.then(() => {
 				// setMsgs([...msgs, res]);
 				setMsg("");
 			})

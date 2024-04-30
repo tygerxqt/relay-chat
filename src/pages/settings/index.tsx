@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/providers/auth";
 import { LogOut, X } from "lucide-react";
-import { Link, NavLink, Outlet, redirect, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 export default function SettingsLayout() {
 	const { logOut } = useAuth();
