@@ -30,7 +30,6 @@ export function AddFriends({
 	const [loading, setLoading] = useState(false);
 	const [results, setResults] = useState<RecordModel[]>([]);
 
-	const [incomingRequests, setIncomingRequests] = useState<string[]>([]);
 	const [outgoingRequests, setOutgoingRequests] = useState<string[]>([]);
 	const { friends } = useAuth();
 
@@ -39,22 +38,19 @@ export function AddFriends({
 			.collection("friend_requests")
 			.getFullList({ expand: "to,from" })
 			.then((res) => {
-				console.log(res);
-				const incoming = res
-					.filter((record) => record.expand?.to.id === pb.authStore.model?.id)
-					.map((record) => record.expand?.to.id);
+				3;
+
 				const outgoing = res
 					.filter((record) => record.expand?.from.id === pb.authStore.model?.id)
-					.map((record) => record.expand?.from.id);
-				console.log("Incoming friend requests: ", incoming);
+					.map((record) => record.expand?.to.id);
+
 				console.log("Outgoing friend requests: ", outgoing);
-				setIncomingRequests(incoming);
+
 				setOutgoingRequests(outgoing);
 			});
 	}
 
 	async function fetchFriends() {
-		setLoading(true);
 		const res = await pb.collection("users").getFullList({
 			filter: `username ~ "${query}"`,
 		});
@@ -64,13 +60,16 @@ export function AddFriends({
 			.filter((user) => !results.find((result) => result.id === user.id));
 
 		setResults([...results, ...nextUsers]);
-		setLoading(false);
 	}
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
+			setLoading(true);
+
 			fetchFriends();
 			fetchRequests();
+
+			setLoading(false);
 		}, 300);
 
 		return () => clearTimeout(timer);
@@ -84,14 +83,20 @@ export function AddFriends({
 				throw new Error("You are already friends with this user.");
 			}
 
+			// Create a friend request
 			await pb.collection("friend_requests").create({
 				from: pb.authStore.model?.id,
 				to: id,
 			});
+
+			// Add friend to user's friend list
+			await pb.collection("users").update(pb.authStore.model?.id, {
+				friends: [...currentFriends, id],
+			});
 		}
 
 		toast.promise(sendRequest(), {
-			loading: "Adding friend...",
+			loading: "Sending request...",
 			success: "Success! Friend request sent.",
 			error(error) {
 				return error.message;

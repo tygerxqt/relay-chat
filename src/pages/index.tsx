@@ -1,4 +1,3 @@
-import { AddFriends } from "@/components/chat/add-friends";
 import { Button } from "@/components/ui/button";
 import {
 	Tooltip,
@@ -6,8 +5,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAuth } from "@/providers/auth";
-import { Cog, LogOut, UserSearchIcon } from "lucide-react";
-import { useState } from "react";
+import { Cog, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Home() {
