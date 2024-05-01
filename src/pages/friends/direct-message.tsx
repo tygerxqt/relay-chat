@@ -1,18 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DirectMessage } from "@/types/message";
-import { FilePlusIcon, Pin, SendHorizontalIcon, UserIcon } from "lucide-react";
+import { SendHorizontalIcon, UserMinusIcon } from "lucide-react";
 import { makeLoader, useLoaderData } from "react-router-typesafe";
 import { useEffect, useState } from "react";
 import User from "@/types/user";
-import pb from "@/lib/pocketbase"
+import pb from "@/lib/pocketbase";
 import { toast } from "sonner";
 import Message from "@/components/chat/message";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RecordSubscription } from "pocketbase";
+import { useNavigate } from "react-router-dom";
 
 export default function DirectMessagePage() {
 	const { recipient } = useLoaderData<typeof loader>();
+	const navigate = useNavigate();
 
 	const [msg, setMsg] = useState("");
 	const [msgs, setMsgs] = useState<DirectMessage[]>([]);
@@ -39,6 +41,31 @@ export default function DirectMessagePage() {
 			.catch((err) => {
 				toast.error(err.message);
 			});
+	};
+
+	const onFriendRemove = async () => {
+		// Remove them from your friends list
+		await pb.collection<User>("users").update(pb.authStore.model?.id, {
+			friends: pb.authStore.model?.expand.friends?.filter(
+				(f: any) => f.id !== recipient.id
+			),
+		});
+
+		// Delete all direct messages between you and the recipient
+		const messages = await pb
+			.collection<DirectMessage>("direct_messages")
+			.getList(1, 50, {
+				filter: `(recipient.id = "${recipient.id}" || recipient.id = "${pb.authStore.model?.id}")`,
+			});
+
+		messages.items.forEach(async (msg) => {
+			await pb.collection<DirectMessage>("direct_messages").delete(msg.id);
+		});
+
+		// Navigate home
+		navigate("/");
+
+		toast.success("Friend removed successfully");
 	};
 
 	useEffect(() => {
@@ -131,21 +158,15 @@ export default function DirectMessagePage() {
 								<div className="flex flex-row items-center">
 									<Tooltip delayDuration={150}>
 										<TooltipTrigger>
-											<Button size="icon" variant="ghost">
-												<Pin size={24} />
+											<Button
+												size="icon"
+												variant="ghost"
+												onClick={async () => await onFriendRemove()}
+											>
+												<UserMinusIcon size={24} />
 											</Button>
 										</TooltipTrigger>
-										<TooltipContent>Pinned Messages</TooltipContent>
-									</Tooltip>
-									<Tooltip delayDuration={150}>
-										<TooltipTrigger>
-											<Button size="icon" variant="ghost">
-												<UserIcon size={24} />
-											</Button>
-										</TooltipTrigger>
-										<TooltipContent>
-											View @{recipient.username}'s profile
-										</TooltipContent>
+										<TooltipContent>Remove Friend</TooltipContent>
 									</Tooltip>
 								</div>
 							</>
@@ -169,16 +190,8 @@ export default function DirectMessagePage() {
 				</ScrollArea>
 				<div className="flex flex-row gap-2 p-2 border-t border-black/10 dark:border-white/10 w-full">
 					<div className="flex flex-row items-center border rounded-md gap-2 w-full h-full">
-						<Tooltip delayDuration={300}>
-							<TooltipTrigger>
-								<Button variant="ghost" size="icon">
-									<FilePlusIcon size={18} />
-								</Button>
-							</TooltipTrigger>
-							<TooltipContent>Attach Files</TooltipContent>
-						</Tooltip>
 						<input
-							className="w-full max-h-32 bg-neutral-50 dark:bg-neutral-950 focus:outline-none text-pretty"
+							className="w-full max-h-32 bg-neutral-50 dark:bg-neutral-950 focus:outline-none text-pretty pl-2	"
 							value={msg}
 							onChange={(e) => setMsg(e.target.value)}
 						/>

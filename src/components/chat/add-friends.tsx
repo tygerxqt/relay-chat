@@ -12,12 +12,12 @@ import {
 import pb from "@/lib/pocketbase";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { RecordModel } from "pocketbase";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/auth";
 import Spinner from "../spinner";
+import User from "@/types/user";
 
 export function AddFriends({
 	open,
@@ -28,76 +28,59 @@ export function AddFriends({
 }) {
 	const [query, setQuery] = useState("");
 	const [loading, setLoading] = useState(false);
-	const [results, setResults] = useState<RecordModel[]>([]);
+	const [results, setResults] = useState<User[]>([]);
 
-	const [outgoingRequests, setOutgoingRequests] = useState<string[]>([]);
 	const { friends } = useAuth();
 
-	async function fetchRequests() {
-		await pb
-			.collection("friend_requests")
-			.getFullList({ expand: "to,from" })
-			.then((res) => {
-				3;
+	async function fetchQuery() {
+		setLoading(true);
 
-				const outgoing = res
-					.filter((record) => record.expand?.from.id === pb.authStore.model?.id)
-					.map((record) => record.expand?.to.id);
-
-				console.log("Outgoing friend requests: ", outgoing);
-
-				setOutgoingRequests(outgoing);
-			});
-	}
-
-	async function fetchFriends() {
-		const res = await pb.collection("users").getFullList({
+		const res = await pb.collection<User>("users").getFullList({
+			expand: "friends",
 			filter: `username ~ "${query}"`,
 		});
 
+		console.log(res);
+
 		const nextUsers = res
+			// Remove the auth user
 			.filter((user) => user.id !== pb.authStore.model?.id)
+			// Exclude users who are already part of the state
 			.filter((user) => !results.find((result) => result.id === user.id));
 
 		setResults([...results, ...nextUsers]);
+		setLoading(false);
 	}
 
+	// Fetch query every 3 seconds
 	useEffect(() => {
 		const timer = setTimeout(() => {
-			setLoading(true);
-
-			fetchFriends();
-			fetchRequests();
-
-			setLoading(false);
-		}, 300);
+			fetchQuery();
+		}, 3000);
 
 		return () => clearTimeout(timer);
 	}, [query]);
 
-	const sendFriendRequest = (id: string) => {
-		async function sendRequest() {
+	useEffect(() => {
+		fetchQuery();
+	}, []);
+
+	const addFriend = (id: string) => {
+		async function addFriend() {
 			let currentFriends = pb.authStore.model?.friends;
 
 			if (currentFriends && currentFriends.includes(id)) {
 				throw new Error("You are already friends with this user.");
 			}
 
-			// Create a friend request
-			await pb.collection("friend_requests").create({
-				from: pb.authStore.model?.id,
-				to: id,
-			});
-
-			// Add friend to user's friend list
 			await pb.collection("users").update(pb.authStore.model?.id, {
 				friends: [...currentFriends, id],
 			});
 		}
 
-		toast.promise(sendRequest(), {
-			loading: "Sending request...",
-			success: "Success! Friend request sent.",
+		toast.promise(addFriend(), {
+			loading: "Adding friend...",
+			success: `Success!`,
 			error(error) {
 				return error.message;
 			},
@@ -144,19 +127,33 @@ export function AddFriends({
 									<span className="font-medium text-md">{result.username}</span>
 								</div>
 								<div>
-									{friends.find((friend) => friend.id === result.id) ? (
-										<Button
-											size="sm"
-											variant="outline"
-											className="flex flex-row gap-2"
-											disabled
-										>
-											<Plus size={16} />
-											Already Friends
-										</Button>
-									) : (
-										<>
-											{outgoingRequests.includes(result.id) ? (
+									{
+										// Auth Added + User Added = Friends
+										friends.find((friend) => friend.id === result.id) &&
+											result.friends &&
+											result.friends.find(
+												(id) => id === pb.authStore.model?.id
+											) && (
+												<>
+													<Button
+														size="sm"
+														variant="outline"
+														className="flex flex-row gap-2"
+														disabled
+													>
+														<Plus size={16} />
+														Already Friends
+													</Button>
+												</>
+											)
+									}
+
+									{
+										// Auth Added + User Not Added = Request Sent
+										friends.find((friend) => friend.id === result.id) &&
+											result.friends.find(
+												(id) => id !== pb.authStore.model?.id
+											) && (
 												<>
 													<Button
 														size="sm"
@@ -168,20 +165,47 @@ export function AddFriends({
 														Request Sent
 													</Button>
 												</>
-											) : (
+											)
+									}
+
+									{
+										// Auth not added + User added = Incoming
+										result.expand.friends &&
+											result.friends.find(
+												(id) => id === pb.authStore.model?.id
+											) &&
+											friends.find((friend) => friend.id !== result.id) && (
+												<>
+													<Button
+														size="sm"
+														variant="outline"
+														className="flex flex-row gap-2"
+													>
+														<Plus size={16} />
+														Accept Request
+													</Button>
+												</>
+											)
+									}
+
+									{
+										// Auth not added + User not added = Add
+										friends.find((friend) => friend.id !== result.id) &&
+											result.friends.find(
+												(id) => id !== pb.authStore.model?.id
+											) && (
 												<>
 													<Button
 														size="sm"
 														className="flex flex-row gap-2"
-														onClick={() => sendFriendRequest(result.id)}
+														onClick={() => addFriend(result.id)}
 													>
 														<Plus size={16} />
 														Add
 													</Button>
 												</>
-											)}
-										</>
-									)}
+											)
+									}
 								</div>
 							</CommandItem>
 						))}

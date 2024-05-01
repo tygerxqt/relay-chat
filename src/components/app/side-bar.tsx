@@ -14,20 +14,23 @@ import { TooltipTrigger } from "@radix-ui/react-tooltip";
 export default function Sidebar() {
 	const { user, friends } = useAuth();
 	const [friendsOpen, setFriendsOpen] = useState(false);
-	const [incomingRequests, setIncomingRequests] = useState<
-		{ user: User; record: string }[]
-	>([]);
+	const [incomingRequests, setIncomingRequests] = useState<User[]>([]);
 
 	async function fetchRequests() {
 		await pb
-			.collection("friend_requests")
-			.getFullList({ expand: "to,from" })
+			.collection<User>("users")
+			.getFullList({ expand: "friends" })
 			.then((res) => {
 				console.log(res);
 
-				const incoming = res
-					.filter((record) => record.expand?.to.id === pb.authStore.model?.id)
-					.map((record) => ({ user: record.expand?.from, record: record.id }));
+				const incoming = res.filter(
+					(record) =>
+						record.expand.friends &&
+						record.expand.friends.find(
+							(friend) => friend.id === pb.authStore.model?.id
+						) &&
+						friends.find((friend) => friend.id !== record.id)
+				);
 
 				console.log("Incoming friend requests: ", incoming);
 
@@ -35,26 +38,31 @@ export default function Sidebar() {
 			});
 	}
 
-	async function acceptRequest(record: { user: User; record: string }) {
-		await pb.collection("friend_requests").delete(record.record);
+	async function acceptRequest(record: User) {
+		// Add record user to auth user's friends list
 		await pb.collection("users").update(pb.authStore.model?.id, {
-			friends: [...friends, record.user.id],
+			friends: [...friends, record.id],
 		});
 	}
 
-	async function declineRequest(record: { user: User; record: string }) {
-		await pb.collection("friend_requests").delete(record.record);
+	async function declineRequest(record: User) {
+		// Remove auth user from record user's friends list
+		await pb.collection<User>("users").update(record.id, {
+			friends: record.expand.friends?.filter(
+				(friend) => friend.id !== pb.authStore.model?.id
+			),
+		});
 	}
 
 	useEffect(() => {
 		fetchRequests();
 
-		pb.collection("friend_requests").subscribe("*", async () => {
+		pb.collection("users").subscribe("*", async () => {
 			await fetchRequests();
 		});
 
 		return () => {
-			pb.collection("friend_requests").unsubscribe("*");
+			pb.collection("users").unsubscribe("*");
 		};
 	}, []);
 
@@ -151,7 +159,7 @@ export default function Sidebar() {
 																return (
 																	<>
 																		<div
-																			id={record.user.id}
+																			id={record.id}
 																			className="flex flex-row gap-2 items-center justify-between px-3 py-2"
 																		>
 																			<div>
@@ -159,13 +167,13 @@ export default function Sidebar() {
 																					src={`${
 																						import.meta.env.VITE_AUTH_URL
 																					}/api/files/_pb_users_auth_/${
-																						record.user.id
-																					}/${record.user.avatar}`}
-																					alt={record.user.username}
+																						record.id
+																					}/${record.avatar}`}
+																					alt={record.username}
 																					className="w-8 h-8 rounded-full"
 																				/>
 																				<span className="font-medium overflow-hidden text-ellipsis">
-																					{record.user.username}
+																					{record.username}
 																				</span>
 																			</div>
 																			<div className="flex flex-row gap-2 items-center">
