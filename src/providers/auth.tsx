@@ -10,7 +10,6 @@ export interface AuthSession {
 	loggedIn: typeof pb.authStore.isValid;
 
 	friends: Array<User>;
-	friendRequests: Array<User>;
 
 	avatar: string;
 	isDefaultAvatar: boolean;
@@ -47,7 +46,6 @@ export const AuthContext = React.createContext<AuthSession>({
 	loggedIn: pb.authStore.isValid,
 
 	friends: [],
-	friendRequests: [],
 
 	avatar: pb.authStore.model?.avatar
 		? `${import.meta.env.VITE_AUTH_URL}/api/files/_pb_users_auth_/${

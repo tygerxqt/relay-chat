@@ -87,6 +87,55 @@ export function AddFriends({
 		});
 	};
 
+	if (results.length >= 1) {
+		results.map((result) => {
+			// If user is friends with result
+
+			if (
+				typeof friends.find((friend) => friend.id === result.id) !==
+					"undefined" &&
+				typeof result.friends.find((id) => id === pb.authStore.model?.id) !==
+					"undefined"
+			) {
+				console.log("Already Friends");
+			} else if (
+				typeof friends.find((friend) => friend.id === result.id) !==
+					"undefined" &&
+				typeof result.friends.find((id) => id === pb.authStore.model?.id) ===
+					"undefined"
+			) {
+				console.log("Request Sent");
+			} else if (
+				typeof friends.find((friend) => friend.id === result.id) ===
+					"undefined" &&
+				typeof result.friends.find((id) => id === pb.authStore.model?.id) !==
+					"undefined"
+			) {
+				console.log("Incoming");
+			} else if (
+				typeof friends.find((friend) => friend.id === result.id) ===
+					"undefined" &&
+				typeof result.friends.find((id) => id === pb.authStore.model?.id) ===
+					"undefined"
+			) {
+				console.log("Not Friends");
+			} else {
+				console.log(
+					"Auth is friends with result: ",
+					friends.find((friend) => friend.id === result.id) ? true : false
+				);
+
+				// If result is friends with auth
+				console.log(
+					"Result is friends with auth: ",
+					result.friends.find((id) => id === pb.authStore.model?.id)
+						? true
+						: false
+				);
+			}
+		});
+	}
+
 	const isDesktop = useMediaQuery("(min-width: 768px)");
 
 	const children = (
@@ -103,112 +152,122 @@ export function AddFriends({
 							<p className="text-sm">{results.length} results found</p>
 							{loading && <Spinner size={16} />}
 						</div>
-						{results.map((result) => (
-							<CommandItem
-								id={result.id}
-								className="flex flex-row items-center justify-between w-full gap-2 bg-transparent dark:bg-transparent"
-								disabled={false}
-							>
-								{" "}
-								<div className="flex flex-row items-center gap-2">
-									<Avatar>
-										<AvatarImage
-											src={`${
-												import.meta.env.VITE_AUTH_URL
-											}/api/files/_pb_users_auth_/${result.id}/${
-												result.avatar
-											}`}
-											alt={result.username}
-										/>
-										<AvatarFallback>
-											{result.username.slice(0, 2).toUpperCase()}
-										</AvatarFallback>
-									</Avatar>
-									<span className="font-medium text-md">{result.username}</span>
-								</div>
-								<div>
-									{
-										// Auth Added + User Added = Friends
-										friends.find((friend) => friend.id === result.id) &&
-											result.friends &&
-											result.friends.find(
-												(id) => id === pb.authStore.model?.id
-											) && (
-												<>
-													<Button
-														size="sm"
-														variant="outline"
-														className="flex flex-row gap-2"
-														disabled
-													>
-														<Plus size={16} />
-														Already Friends
-													</Button>
-												</>
-											)
-									}
+						{results.length >= 1 &&
+							results.map((result) => (
+								<CommandItem
+									id={result.id}
+									className="flex flex-row items-center justify-between w-full gap-2 bg-transparent dark:bg-transparent"
+									disabled={false}
+								>
+									{" "}
+									<div className="flex flex-row items-center gap-2">
+										<Avatar>
+											<AvatarImage
+												src={`${
+													import.meta.env.VITE_AUTH_URL
+												}/api/files/_pb_users_auth_/${result.id}/${
+													result.avatar
+												}`}
+												alt={result.username}
+											/>
+											<AvatarFallback>
+												{result.username.slice(0, 2).toUpperCase()}
+											</AvatarFallback>
+										</Avatar>
+										<span className="font-medium text-md">
+											{result.username}
+										</span>
+									</div>
+									<div>
+										{
+											// Auth Added + User Added = Friends
+											typeof friends.find(
+												(friend) => friend.id === result.id
+											) !== "undefined" &&
+												typeof result.friends.find(
+													(id) => id === pb.authStore.model?.id
+												) !== "undefined" && (
+													<>
+														<Button
+															size="sm"
+															variant="outline"
+															className="flex flex-row gap-2"
+															disabled
+														>
+															<Plus size={16} />
+															Already Friends
+														</Button>
+													</>
+												)
+										}
 
-									{
-										// Auth Added + User Not Added = Request Sent
-										friends.find((friend) => friend.id === result.id) &&
-											result.friends.find(
-												(id) => id !== pb.authStore.model?.id
-											) && (
-												<>
-													<Button
-														size="sm"
-														variant="outline"
-														className="flex flex-row gap-2"
-														disabled
-													>
-														<Plus size={16} />
-														Request Sent
-													</Button>
-												</>
-											)
-									}
+										{
+											// Auth Added + User Not Added = Request Sent
+											typeof friends.find(
+												(friend) => friend.id === result.id
+											) !== "undefined" &&
+												typeof result.friends.find(
+													(id) => id === pb.authStore.model?.id
+												) === "undefined" && (
+													<>
+														<Button
+															size="sm"
+															variant="outline"
+															className="flex flex-row gap-2"
+															disabled
+														>
+															<Plus size={16} />
+															Request Sent
+														</Button>
+													</>
+												)
+										}
 
-									{
-										// Auth not added + User added = Incoming
-										result.expand.friends &&
-											result.friends.find(
-												(id) => id === pb.authStore.model?.id
-											) &&
-											friends.find((friend) => friend.id !== result.id) && (
-												<>
-													<Button
-														size="sm"
-														variant="outline"
-														className="flex flex-row gap-2"
-													>
-														<Plus size={16} />
-														Accept Request
-													</Button>
-												</>
-											)
-									}
+										{
+											// Auth not added + User added = Incoming
+											typeof friends.find(
+												(friend) => friend.id === result.id
+											) === "undefined" &&
+												typeof result.friends.find(
+													(id) => id === pb.authStore.model?.id
+												) !== "undefined" && (
+													<>
+														<Button
+															size="sm"
+															variant="outline"
+															className="flex flex-row gap-2"
+															onClick={() => addFriend(result.id)}
+														>
+															<Plus size={16} />
+															Accept Request
+														</Button>
+													</>
+												)
+										}
 
-									{
-										// Auth not added + User not added = Add
-										friends.find((friend) => friend.id !== result.id) &&
-											result.friends.find(
-												(id) => id !== pb.authStore.model?.id
-											) && (
-												<>
-													<Button
-														size="sm"
-														className="flex flex-row gap-2"
-														onClick={() => addFriend(result.id)}
-													>
-														<Plus size={16} />
-														Add
-													</Button>
-												</>
-											)
-									}
-								</div>
-							</CommandItem>
-						))}
+										{
+											// Auth not added + User not added = Add
+											typeof friends.find(
+												(friend) => friend.id === result.id
+											) === "undefined" &&
+												typeof result.friends.find(
+													(id) => id === pb.authStore.model?.id
+												) === "undefined" && (
+													<>
+														<Button
+															size="sm"
+															className="flex flex-row gap-2"
+															onClick={() => addFriend(result.id)}
+														>
+															<Plus size={16} />
+															Add
+														</Button>
+													</>
+												)
+										}
+									</div>
+								</CommandItem>
+							))}
 					</CommandGroup>
 					<CommandEmpty className="py-6 text-sm text-center">
 						No results found.

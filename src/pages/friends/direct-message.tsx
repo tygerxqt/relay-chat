@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { DirectMessage } from "@/types/message";
 import { SendHorizontalIcon, UserMinusIcon } from "lucide-react";
 import { makeLoader, useLoaderData } from "react-router-typesafe";
@@ -10,11 +14,14 @@ import { toast } from "sonner";
 import Message from "@/components/chat/message";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RecordSubscription } from "pocketbase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useRevalidator } from "react-router-dom";
+import Spinner from "@/components/spinner";
 
 export default function DirectMessagePage() {
-	const { recipient } = useLoaderData<typeof loader>();
+	const { recipient, friends, requestSent, requestRecieved } =
+		useLoaderData<typeof loader>();
 	const navigate = useNavigate();
+	const revalidator = useRevalidator();
 
 	const [msg, setMsg] = useState("");
 	const [msgs, setMsgs] = useState<DirectMessage[]>([]);
@@ -51,38 +58,49 @@ export default function DirectMessagePage() {
 			),
 		});
 
-		// Delete all direct messages between you and the recipient
-		const messages = await pb
-			.collection<DirectMessage>("direct_messages")
-			.getList(1, 50, {
-				filter: `(recipient.id = "${recipient.id}" || recipient.id = "${pb.authStore.model?.id}")`,
-			});
-
-		messages.items.forEach(async (msg) => {
-			await pb.collection<DirectMessage>("direct_messages").delete(msg.id);
-		});
-
 		// Navigate home
 		navigate("/");
 
 		toast.success("Friend removed successfully");
 	};
 
+	const addFriend = (id: string) => {
+		async function addFriend() {
+			let currentFriends = pb.authStore.model?.friends;
+
+			if (currentFriends && currentFriends.includes(id)) {
+				throw new Error("You are already friends with this user.");
+			}
+
+			await pb.collection("users").update(pb.authStore.model?.id, {
+				friends: [...currentFriends, id],
+			});
+		}
+
+		toast.promise(addFriend(), {
+			loading: "Adding friend...",
+			success: `Success!`,
+			error(error) {
+				return error.message;
+			},
+		});
+	};
+
 	useEffect(() => {
 		pb.collection<DirectMessage>("direct_messages")
-			.getList(1, 50, {
+			.getFullList({
 				filter: `(recipient.id = "${recipient.id}" || recipient.id = "${pb.authStore.model?.id}")`,
 				expand: "author, recipient",
 				sort: "+created",
 			})
 			.then((res) => {
-				setMsgs(res.items);
+				setMsgs(res);
+				console.log("Messages: ", res);
 			});
 
 		pb.collection<DirectMessage>("direct_messages").subscribe(
 			"*",
 			(e: RecordSubscription<DirectMessage>) => {
-				console.log(e.action, e.record);
 				switch (e.action) {
 					case "create": {
 						if (
@@ -91,23 +109,28 @@ export default function DirectMessagePage() {
 								e.record.expand.recipient.id,
 							].includes(recipient.id || pb.authStore.model?.id)
 						) {
-							console.log("RECORD: ", e.record);
 							setMsgs((prev) => [...prev, e.record]);
 						}
 						break;
 					}
 
 					case "update": {
-						const index = msgs.findIndex((msg) => msg.id === e.record.id);
-						msgs[index] = e.record;
-						setMsgs([...msgs]);
+						// update the message in the list
+						setMsgs((prev) =>
+							prev.map((msg) => {
+								if (msg.id === e.record.id) {
+									return e.record;
+								}
+
+								return msg;
+							})
+						);
 						break;
 					}
 
 					case "delete": {
-						const index = msgs.findIndex((msg) => msg.id === e.record.id);
-						msgs.splice(index, 1);
-						setMsgs([...msgs]);
+						// remove the message from the list
+						setMsgs((prev) => prev.filter((msg) => msg.id !== e.record.id));
 						break;
 					}
 				}
@@ -173,42 +196,83 @@ export default function DirectMessagePage() {
 						)}
 					</div>
 				</div>
-				<ScrollArea className="h-full flex flex-col w-full grow">
-					{msgs && msgs.length === 0 ? (
-						<>
-							<div className="flex flex-col justify-center items-center w-full min-h-full grow">
-								<span className="text-medium">No messages yet</span>
+				{friends && (
+					<>
+						<ScrollArea className="h-full flex flex-col w-full grow">
+							{msgs && msgs.length === 0 ? (
+								<>
+									<div className="h-full flex flex-col w-full grow">
+										<div className="flex flex-col gap-3 justify-center items-center w-full min-h-full grow">
+											<p className="font-medium">No messages yet.</p>
+										</div>
+									</div>
+								</>
+							) : (
+								<>
+									{msgs.map((msg) => {
+										return <Message msg={msg} />;
+									})}
+								</>
+							)}
+						</ScrollArea>
+						<div className="flex flex-row gap-2 p-2 border-t border-black/10 dark:border-white/10 w-full">
+							<div className="flex flex-row items-center border rounded-md gap-2 w-full h-full">
+								<input
+									className="w-full max-h-32 bg-neutral-50 dark:bg-neutral-950 focus:outline-none text-pretty pl-2	"
+									value={msg}
+									onChange={(e) => setMsg(e.target.value)}
+								/>
+								<Tooltip delayDuration={300}>
+									<TooltipTrigger>
+										<Button
+											variant="ghost"
+											size="icon"
+											onClick={async () => await onMessageSubmit()}
+										>
+											<SendHorizontalIcon size={18} />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>Send</TooltipContent>
+								</Tooltip>
 							</div>
-						</>
-					) : (
-						<>
-							{msgs.map((msg) => {
-								return <Message msg={msg} />;
-							})}
-						</>
-					)}
-				</ScrollArea>
-				<div className="flex flex-row gap-2 p-2 border-t border-black/10 dark:border-white/10 w-full">
-					<div className="flex flex-row items-center border rounded-md gap-2 w-full h-full">
-						<input
-							className="w-full max-h-32 bg-neutral-50 dark:bg-neutral-950 focus:outline-none text-pretty pl-2	"
-							value={msg}
-							onChange={(e) => setMsg(e.target.value)}
-						/>
-						<Tooltip delayDuration={300}>
-							<TooltipTrigger>
-								<Button
-									variant="ghost"
-									size="icon"
-									onClick={async () => await onMessageSubmit()}
-								>
-									<SendHorizontalIcon size={18} />
+						</div>
+					</>
+				)}
+				{requestSent && (
+					<div className="h-full flex flex-col w-full grow">
+						<div className="flex flex-col gap-3 justify-center items-center w-full min-h-full grow">
+							<h1 className="text-3xl font-black">(｡•́︿•̀｡)</h1>
+							<span className="text-medium">
+								<b>{recipient.username}</b> hasn't accepted your friends request
+								yet.
+							</span>
+							{revalidator.state === "loading" ? (
+								<Spinner />
+							) : (
+								<Button size="sm" onClick={() => revalidator.revalidate()}>
+									Refresh
 								</Button>
-							</TooltipTrigger>
-							<TooltipContent>Send</TooltipContent>
-						</Tooltip>
+							)}
+						</div>
 					</div>
-				</div>
+				)}
+				{requestRecieved && (
+					<div className="h-full flex flex-col w-full grow">
+						<div className="flex flex-col gap-3 justify-center items-center w-full min-h-full grow">
+							<h1 className="text-3xl font-black">(°ロ°)</h1>
+							<span className="text-medium">
+								<b>{recipient.username}</b> has sent you a friend request.
+							</span>
+							{revalidator.state === "loading" ? (
+								<Spinner />
+							) : (
+								<Button size="sm" onClick={() => addFriend(recipient.id)}>
+									Accept
+								</Button>
+							)}
+						</div>
+					</div>
+				)}
 			</main>
 		</>
 	);
@@ -229,34 +293,76 @@ export const loader = makeLoader(async ({ params }) => {
 		expand: "friends",
 	});
 
-	if (!user || !recipient) {
-		throw new Error(
-			"Failed to fetch either the user or the recipient. Make sure you are friends with the recipient to send direct messages."
-		);
-	}
-
-	if (!user.expand.friends || user.expand.friends.length <= 0) {
-		throw new Error(
-			"You have no friends. Make sure you add friends to send direct messages."
-		);
-	}
-
-	if (!recipient.expand.friends || recipient.expand.friends.length <= 0) {
-		throw new Error(
-			"The recipient has not added you as a friend. Make sure they add you to send direct messages."
-		);
-	}
-
 	if (
-		!user.expand.friends?.map((f) => f.id).includes(params.id) ||
-		!recipient.expand.friends?.map((f) => f.id).includes(pb.authStore.model?.id)
+		typeof user.friends.find((friend) => friend === recipient.id) !==
+			"undefined" &&
+		typeof recipient.friends.find((id) => id === pb.authStore.model?.id) !==
+			"undefined"
 	) {
-		throw new Error(
-			"You and the recipient are not friends. Make sure you both add each other as friends to send direct messages."
+		return {
+			recipient,
+			friends: true,
+			requestSent: false,
+			requestRecieved: false,
+		};
+	} else if (
+		typeof user.friends.find((friend) => friend === recipient.id) !==
+			"undefined" &&
+		typeof recipient.friends.find((id) => id === pb.authStore.model?.id) ===
+			"undefined"
+	) {
+		// The recipient has not accepted your friend request yet
+		return {
+			recipient,
+			friends: false,
+			requestSent: true,
+			requestRecieved: false,
+		};
+	} else if (
+		typeof user.friends.find((friend) => friend === recipient.id) ===
+			"undefined" &&
+		typeof recipient.friends.find((id) => id === pb.authStore.model?.id) !==
+			"undefined"
+	) {
+		// "You have not accepted the recipient's friend request yet."
+		return {
+			recipient,
+			friends: false,
+			requestSent: false,
+			requestRecieved: true,
+		};
+	} else if (
+		typeof user.friends.find((friend) => friend === recipient.id) ===
+			"undefined" &&
+		typeof recipient.friends.find((id) => id === pb.authStore.model?.id) ===
+			"undefined"
+	) {
+		// "You are not friends with this user."
+		return {
+			recipient,
+			friends: false,
+			requestSent: false,
+			requestRecieved: false,
+		};
+	} else {
+		console.log(
+			"Auth is friends with result: ",
+			user.friends.find((friend) => friend === recipient.id) ? true : false
 		);
-	}
 
-	return {
-		recipient,
-	};
+		// If result is friends with auth
+		console.log(
+			"Result is friends with auth: ",
+			recipient.friends.find((id) => id === pb.authStore.model?.id)
+				? true
+				: false
+		);
+
+		return {
+			recipient,
+			friends: false,
+			requestSent: false,
+			requestRecieved: false,
+		};
+	}
 });
