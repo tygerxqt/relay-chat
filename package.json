@@ -21,7 +21,7 @@
 		"@radix-ui/react-slot": "^1.0.2",
 		"@radix-ui/react-switch": "^1.0.3",
 		"@radix-ui/react-tooltip": "^1.0.7",
-		"@tauri-apps/api": "^1.5.4",
+		"@tauri-apps/api": "^1.5.5",
 		"buffer": "^6.0.3",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
@@ -36,17 +36,17 @@
 		"react-dom": "^18.3.1",
 		"react-image-crop": "^11.0.5",
 		"react-resizable-panels": "^2.0.19",
-		"react-router-dom": "^6.23.0",
+		"react-router-dom": "^6.23.1",
 		"react-router-typesafe": "^1.5.0",
 		"sonner": "^1.4.41",
 		"sort-by": "^1.2.0",
 		"tailwind-merge": "^2.3.0",
 		"tailwindcss-animate": "^1.0.7",
-		"vaul": "^0.9.0"
+		"vaul": "^0.9.1"
 	},
 	"devDependencies": {
-		"@tauri-apps/cli": "^1.5.12",
-		"@types/node": "^20.12.7",
+		"@tauri-apps/cli": "^1.5.13",
+		"@types/node": "^20.12.11",
 		"@types/react": "^18.3.1",
 		"@types/react-dom": "^18.3.0",
 		"@vitejs/plugin-react": "^4.2.1",
@@ -54,6 +54,6 @@
 		"postcss": "^8.4.38",
 		"tailwindcss": "^3.4.3",
 		"typescript": "^5.4.5",
-		"vite": "^5.2.10"
+		"vite": "^5.2.11"
 	}
 }
