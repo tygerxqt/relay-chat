@@ -122,11 +122,7 @@ export default function Sidebar() {
 																	className="flex flex-row items-center justify-start w-full gap-3 text-medium"
 																>
 																	<img
-																		src={`${
-																			import.meta.env.VITE_AUTH_URL
-																		}/api/files/_pb_users_auth_/${friend.id}/${
-																			friend.avatar
-																		}`}
+																		src={`https://db.relay.tygr.dev/api/files/_pb_users_auth_/${friend.id}/${friend.avatar}`}
 																		alt={friend.username}
 																		className="w-8 h-8 rounded-full"
 																	/>
@@ -164,11 +160,7 @@ export default function Sidebar() {
 																		>
 																			<div>
 																				<img
-																					src={`${
-																						import.meta.env.VITE_AUTH_URL
-																					}/api/files/_pb_users_auth_/${
-																						record.id
-																					}/${record.avatar}`}
+																					src={`https://db.relay.tygr.dev/api/files/_pb_users_auth_/${record.id}/${record.avatar}`}
 																					alt={record.username}
 																					className="w-8 h-8 rounded-full"
 																				/>

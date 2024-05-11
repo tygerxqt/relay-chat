@@ -48,17 +48,13 @@ export const AuthContext = React.createContext<AuthSession>({
 	friends: [],
 
 	avatar: pb.authStore.model?.avatar
-		? `${import.meta.env.VITE_AUTH_URL}/api/files/_pb_users_auth_/${
-				pb.authStore.model.id
-		  }/${pb.authStore.model.avatar}`
+		? `https://db.relay.tygr.dev/api/files/_pb_users_auth_/${pb.authStore.model.id}/${pb.authStore.model.avatar}`
 		: `https://api.dicebear.com/7.x/lorelei-neutral/png?seed=${pb.authStore.model?.username}&radius=50`,
 
 	isDefaultAvatar: pb.authStore.model?.avatar ? false : true,
 
 	banner: pb.authStore.model?.banner
-		? `${import.meta.env.VITE_AUTH_URL}/api/files/_pb_users_auth_/${
-				pb.authStore.model.id
-		  }/${pb.authStore.model.banner}`
+		? `https://db.relay.tygr.dev/api/files/_pb_users_auth_/${pb.authStore.model.id}/${pb.authStore.model.banner}`
 		: `https://images.unsplash.com/photo-1636955816868-fcb881e57954?q=50`,
 
 	isDefaultBanner: pb.authStore.model?.banner ? false : true,
@@ -87,9 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [user, setUser] = React.useState(pb.authStore.model);
 	const [avatar, setAvatar] = React.useState(
 		pb.authStore.model?.avatar
-			? `${import.meta.env.VITE_AUTH_URL}/api/files/_pb_users_auth_/${
-					pb.authStore.model.id
-			  }/${pb.authStore.model.avatar}`
+			? `https://db.relay.tygr.dev/api/files/_pb_users_auth_/${pb.authStore.model.id}/${pb.authStore.model.avatar}`
 			: `https://api.dicebear.com/7.x/lorelei-neutral/png?seed=${pb.authStore.model?.username}&radius=50`
 	);
 	const [isDefaultAvatar, setIsDefaultAvatar] = React.useState(
@@ -97,9 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	);
 	const [banner, setBanner] = React.useState(
 		pb.authStore.model?.banner
-			? `${import.meta.env.VITE_AUTH_URL}/api/files/_pb_users_auth_/${
-					pb.authStore.model.id
-			  }/${pb.authStore.model.banner}`
+			? `https://db.relay.tygr.dev/api/files/_pb_users_auth_/${pb.authStore.model.id}/${pb.authStore.model.banner}`
 			: `https://images.unsplash.com/photo-1636955816868-fcb881e57954?q=50`
 	);
 	const [isDefaultBanner, setIsDefaultBanner] = React.useState(
@@ -263,9 +255,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				loading: "Uploading...",
 				success: (data) => {
 					setAvatar(
-						`${import.meta.env.VITE_AUTH_URL}/api/files/_pb_users_auth_/${
-							data.id
-						}/${data.avatar}`
+						`https://db.relay.tygr.dev/api/files/_pb_users_auth_/${data.id}/${data.avatar}`
 					);
 					return "Successfully uploaded avatar.";
 				},
@@ -306,9 +296,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				loading: "Uploading...",
 				success: (data) => {
 					setBanner(
-						`${import.meta.env.VITE_AUTH_URL}/api/files/_pb_users_auth_/${
-							data.id
-						}/${data.banner}`
+						`https://db.relay.tygr.dev/api/files/_pb_users_auth_/${data.id}/${data.banner}`
 					);
 					return "Successfully uploaded banner.";
 				},
@@ -365,18 +353,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				setUser(response.record);
 				setAvatar(
 					response.record?.avatar
-						? `${import.meta.env.VITE_AUTH_URL}/api/files/_pb_users_auth_/${
-								response.record.id
-						  }/${response.record.avatar}`
+						? `https://db.relay.tygr.dev/api/files/_pb_users_auth_/${response.record.id}/${response.record.avatar}`
 						: `https://api.dicebear.com/7.x/lorelei-neutral/png?seed=${pb.authStore.model?.username}&radius=50`
 				);
 				setIsDefaultAvatar(response.record?.avatar ? false : true);
 
 				setBanner(
 					pb.authStore.model?.banner
-						? `${import.meta.env.VITE_AUTH_URL}/api/files/_pb_users_auth_/${
-								pb.authStore.model.id
-						  }/${pb.authStore.model.banner}`
+						? `https://db.relay.tygr.dev/api/files/_pb_users_auth_/${pb.authStore.model.id}/${pb.authStore.model.banner}`
 						: `https://images.unsplash.com/photo-1636955816868-fcb881e57954?q=80`
 				);
 				setIsDefaultBanner(response.record?.banner ? false : true);

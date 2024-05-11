@@ -18,6 +18,6 @@ export interface ClientError {
 	name: string;
 }
 
-const pb = new PocketBase(import.meta.env.VITE_AUTH_URL);
+const pb = new PocketBase('https://db.relay.tygr.dev');
 
 export default pb;
