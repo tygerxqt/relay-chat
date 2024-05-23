@@ -13,7 +13,11 @@ export default function Message({ msg }: { msg: DirectMessage }) {
 			>
 				<div className="flex flex-row w-full gap-2 items-center">
 					<img
-						src={`https://db.relay.tygr.dev/api/files/_pb_users_auth_/${msg.expand.author.id}/${msg.expand.author.avatar}`}
+						src={
+							msg.expand.author.avatar.length <= 0
+								? `https://api.dicebear.com/7.x/lorelei-neutral/png?seed=${msg.expand.author.username}&radius=50`
+								: `https://relay.pockethost.io/api/files/_pb_users_auth_/${msg.expand.author.id}/${msg.expand.author.avatar}`
+						}
 						alt={msg.expand.author.username}
 						className="w-10 h-10 rounded-full"
 					/>

@@ -18,6 +18,6 @@ export interface ClientError {
 	name: string;
 }
 
-const pb = new PocketBase('https://db.relay.tygr.dev');
+const pb = new PocketBase('https://relay.pockethost.io');
 
 export default pb;

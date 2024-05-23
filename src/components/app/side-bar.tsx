@@ -122,7 +122,11 @@ export default function Sidebar() {
 																	className="flex flex-row items-center justify-start w-full gap-3 text-medium"
 																>
 																	<img
-																		src={`https://db.relay.tygr.dev/api/files/_pb_users_auth_/${friend.id}/${friend.avatar}`}
+																		src={
+																			friend.avatar.length <= 0
+																				? `https://api.dicebear.com/7.x/lorelei-neutral/png?seed=${friend.username}&radius=50`
+																				: `https://relay.pockethost.io/api/files/_pb_users_auth_/${friend.id}/${friend.avatar}`
+																		}
 																		alt={friend.username}
 																		className="w-8 h-8 rounded-full"
 																	/>
@@ -160,7 +164,7 @@ export default function Sidebar() {
 																		>
 																			<div>
 																				<img
-																					src={`https://db.relay.tygr.dev/api/files/_pb_users_auth_/${record.id}/${record.avatar}`}
+																					src={`https://relay.pockethost.io/api/files/_pb_users_auth_/${record.id}/${record.avatar}`}
 																					alt={record.username}
 																					className="w-8 h-8 rounded-full"
 																				/>

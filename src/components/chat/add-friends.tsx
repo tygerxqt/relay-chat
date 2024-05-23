@@ -163,7 +163,7 @@ export function AddFriends({
 									<div className="flex flex-row items-center gap-2">
 										<Avatar>
 											<AvatarImage
-												src={`https://db.relay.tygr.dev/api/files/_pb_users_auth_/${result.id}/${result.avatar}`}
+												src={`https://relay.pockethost.io/api/files/_pb_users_auth_/${result.id}/${result.avatar}`}
 												alt={result.username}
 											/>
 											<AvatarFallback>

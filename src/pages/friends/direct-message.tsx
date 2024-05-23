@@ -168,7 +168,11 @@ export default function DirectMessagePage() {
 							<>
 								<div className="flex flex-row gap-2 items-center">
 									<img
-										src={`https://db.relay.tygr.dev/api/files/_pb_users_auth_/${recipient.id}/${recipient.avatar}`}
+										src={
+											recipient.avatar.length <= 0
+												? `https://api.dicebear.com/7.x/lorelei-neutral/png?seed=${recipient.username}&radius=50`
+												: `https://relay.pockethost.io/api/files/_pb_users_auth_/${recipient.id}/${recipient.avatar}`
+										}
 										alt={recipient.username}
 										className="w-8 h-8 rounded-full"
 									/>
